@@ -32,7 +32,7 @@ Copie e cole o conteudo do arquivo **sketch.json** em **diagram.json** para mont
 Após isso prossiga para **Library Manager** e adicione (botão azul) as seguintes bibliotecas:
 
 * PubSubClient
-* Wifi
+* WiFi
 
 *Atente-se aos nomes, eles devem ser idênticos*
 
