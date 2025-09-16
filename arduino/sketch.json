@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "author": "Anonymous maker",
+    "editor": "wokwi",
+    "parts": [
+      { "type": "wokwi-breadboard-half", "id": "bb1", "top": 189, "left": -314, "attrs": {} },
+      { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -48, "left": -196.76, "attrs": {} },
+      {
+        "type": "wokwi-resistor",
+        "id": "r1",
+        "top": 243.95,
+        "left": -268.8,
+        "attrs": { "value": "1000" }
+      },
+      {
+        "type": "wokwi-resistor",
+        "id": "r2",
+        "top": 243.95,
+        "left": -124.8,
+        "attrs": { "value": "1000" }
+      },
+      {
+        "type": "wokwi-led",
+        "id": "led1",
+        "top": 236.4,
+        "left": -236.2,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-led",
+        "id": "led2",
+        "top": 236.4,
+        "left": -92.2,
+        "attrs": { "color": "red" }
+      }
+    ],
+    "connections": [
+      [ "esp:TX", "$serialMonitor:RX", "", [] ],
+      [ "esp:RX", "$serialMonitor:TX", "", [] ],
+      [ "esp:GND.1", "bb1:tn.1", "black", [ "h0" ] ],
+      [ "esp:5V", "bb1:tp.2", "red", [ "h0" ] ],
+      [ "r1:1", "bb1:3t.b", "", [ "$bb" ] ],
+      [ "r1:2", "bb1:9t.b", "", [ "$bb" ] ],
+      [ "r2:1", "bb1:18t.b", "", [ "$bb" ] ],
+      [ "r2:2", "bb1:24t.b", "", [ "$bb" ] ],
+      [ "bb1:3t.a", "esp:18", "green", [ "h19.2", "v-67.2", "h192", "v-115.2" ] ],
+      [ "bb1:18t.a", "esp:19", "green", [ "v-57.6", "h86.4", "v-134.4" ] ],
+      [ "led2:A", "bb1:24t.e", "", [ "$bb" ] ],
+      [ "led2:C", "bb1:23t.e", "", [ "$bb" ] ],
+      [ "bb1:23t.a", "bb1:tn.19", "green", [ "v0" ] ],
+      [ "bb1:8t.a", "bb1:tn.6", "green", [ "v0" ] ],
+      [ "led1:A", "bb1:9t.e", "", [ "$bb" ] ],
+      [ "led1:C", "bb1:8t.e", "", [ "$bb" ] ]
+    ],
+    "dependencies": {}
+  }

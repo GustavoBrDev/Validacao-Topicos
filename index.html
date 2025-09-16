@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+    <head>
+    <meta charset="utf-8"/>
+    <title>Central de Controle</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    </head>
+    <body>
+        <h1>Minha Central de Controle - Lâmpadas</h1>
+        <div>
+            Sala: <span id="status-sala">Desligado</span><button id="btn-sala">Ligar sala</button>
+        </div>
+        <div>
+            Cozinha: <span id="status-cozinha">Desligado</span><button id="btn-cozinha">Ligar cozinha</button>
+        </div>
+
+        <h3>Log</h3>
+        <div id="log"></div>
+
+        <p>Desenvolvido por Gustavo Stinghen</p>
+
+        <script>
+
+            const BASE = 'ifsc/ctds/topicos/validacao/gustavo-stinghen';
+            const TOPIC_STATUS_SALA = `${BASE}/status/lampadas/sala`;
+            const TOPIC_STATUS_COZINHA = `${BASE}/status/lampadas/cozinha`;
+            const TOPIC_CMD_SALA = `${BASE}/lampadas/sala`;
+            const TOPIC_CMD_COZINHA = `${BASE}/lampadas/cozinha`;
+
+            const statusSala = document.getElementById('status-sala');
+            const statusCozinha = document.getElementById('status-cozinha');
+            const botaoSala = document.getElementById('btn-sala');
+            const botaoCozinha = document.getElementById('btn-cozinha');
+            const logEl = document.getElementById('log');
+
+            function log(msg, persist) {
+                const logMsg = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                addLogToView(logMsg);
+
+                if ( persist && persist == true ){
+                    persistLog(logMsg);
+                }
+            }
+
+            function addLogToView(log) {
+                const d = document.createElement('div');
+                d.textContent = log;
+                logEl.insertBefore(d, logEl.firstChild);
+            }
+
+            function persistLog(msg) {
+                let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+                logs.push(msg);
+                localStorage.setItem("logs", JSON.stringify(logs));
+            }
+
+            const socket = io('http://localhost:3000');
+
+            socket.on('connect', () => { 
+                log('Conectado ao proxy'); 
+                let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+
+                logs.forEach(log => {
+                    addLogToView(log);
+                });
+            });
+            socket.on('disconnect', () => log('Desconectado do proxy'));
+
+            socket.on('mqtt_message', ({ topic, payload }) => {
+                if (topic === TOPIC_STATUS_SALA) {
+                    if ( payload == 0 ){
+                        statusSala.textContent = "Desligado";
+                        botaoSala.textContent = "Ligar sala";
+                    } else {
+                        statusSala.textContent = "Ligado";
+                        botaoSala.textContent = "Desligar sala";
+                    }
+                }
+                if (topic === TOPIC_STATUS_COZINHA) {
+                    if ( payload == 0 ){
+                        statusCozinha.textContent = "Desligado";
+                        botaoCozinha.textContent = "Ligar sala";
+                    } else {
+                        statusCozinha.textContent = "Ligado";
+                        botaoCozinha.textContent = "Desligar sala";
+                    }
+                };
+            });
+
+            botaoSala.addEventListener('click', () => {
+                const ligando = statusSala.textContent.trim().toUpperCase() === 'LIGADO';
+                const next = ligando ? 'OFF' : 'ON';
+                log( ! ligando ? "Ligando lâmpada da sala" : "Desligando lâmpada da sala", true );
+                socket.emit('publish', { topic: TOPIC_CMD_SALA, payload: next });
+            });
+
+            botaoCozinha.addEventListener('click', () => {
+                const ligando = statusCozinha.textContent.trim().toUpperCase() === 'LIGADO';
+                const next = ligando ? 'OFF' : 'ON';
+                log( ! ligando ? "Ligando lâmpada da cozinha" : "Desligando lâmpada da cozinha", true );
+                socket.emit('publish', { topic: TOPIC_CMD_COZINHA, payload: next });
+            });
+
+        </script>
+    </body>
+</html>
